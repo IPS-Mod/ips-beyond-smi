@@ -13,6 +13,7 @@ tree_msk_mh <- readRDS("2_labour_market/intermediate_data/lfs_longitudinal_clean
   filter(Empl1 == 0 & MSK_MH1 == 1)
 
 ### put datasets in a list 
+conditions <- c("msk","mh","msk_mh")
 data_list <- list(tree_msk, tree_mh, tree_msk_mh)
 
 #############################################
@@ -91,7 +92,18 @@ probs <- data.frame(jobstartprob23,
                     jobstartprob2425,
                     jobstartprob2627,
                     jobstartprob2829,
-                    jobstartprob3031)
+                    jobstartprob3031) 
 
+cols <- names(probs)
+
+probs <- pivot_longer(probs,cols = all_of(cols), names_to = "transition", values_to = "probability")
+
+assign(paste0("probs_",conditions[i]), probs)
 
 }
+
+
+write.csv(probs_msk,"2_labour_market/output/transition_probs_msk.csv")
+write.csv(probs_mh,"2_labour_market/output/transition_probs_mh.csv")
+write.csv(probs_msk_mh,"2_labour_market/output/transition_probs_msk_mh.csv")
+
