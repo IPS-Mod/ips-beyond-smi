@@ -8,4 +8,10 @@ options(repos = c(
 # Download and install fingertipsR in R
 install.packages('fingertipsR')
 
-##### INSTALL lfsclean
+##### INSTALL frsclean
+
+devtools::install_git(
+  "https://github.com/djmorris1989/frsclean.git", 
+  ref = "1.0.2",
+  build_vignettes = TRUE
+)
