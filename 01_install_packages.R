@@ -15,3 +15,17 @@ devtools::install_git(
   ref = "1.0.2",
   build_vignettes = TRUE
 )
+
+### Install hseclean from the STAPM github 
+
+devtools::install_git(
+  "https://github.com/STAPM/hseclean.git",
+  ref = "1.11.3",
+  build_vignettes = FALSE)
+
+### Install ukhlsclean from the STAPM github 
+
+devtools::install_git(
+  "https://github.com/STAPM/ukhlsclean.git",
+  ref = "1.0.1",
+  build_vignettes = FALSE)
