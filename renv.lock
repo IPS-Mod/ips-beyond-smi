@@ -24,6 +24,23 @@
       ],
       "Hash": "9b4993e98e0e19da84c168460c032fef"
     },
+    "DT": {
+      "Package": "DT",
+      "Version": "0.31",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "crosstalk",
+        "htmltools",
+        "htmlwidgets",
+        "httpuv",
+        "jquerylib",
+        "jsonlite",
+        "magrittr",
+        "promises"
+      ],
+      "Hash": "77b5189f5272ae2b21e3ac2175ad107c"
+    },
     "MASS": {
       "Package": "MASS",
       "Version": "7.3-60",
@@ -338,6 +355,19 @@
       ],
       "Hash": "c7844b32098dcbd1c59cbd8dddb4ecc6"
     },
+    "crosstalk": {
+      "Package": "crosstalk",
+      "Version": "1.2.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R6",
+        "htmltools",
+        "jsonlite",
+        "lazyeval"
+      ],
+      "Hash": "ab12c7b080a57475248a30f4db6298c0"
+    },
     "curl": {
       "Package": "curl",
       "Version": "5.2.0",
@@ -569,6 +599,26 @@
       "Source": "Repository",
       "Repository": "RSPM",
       "Hash": "f7736a18de97dea803bde0a2daaafb27"
+    },
+    "fingertipsR": {
+      "Package": "fingertipsR",
+      "Version": "1.0.10.9002",
+      "Source": "Repository",
+      "Repository": "https://ropensci.r-universe.dev",
+      "Requirements": [
+        "DT",
+        "R",
+        "curl",
+        "dplyr",
+        "httr",
+        "jsonlite",
+        "miniUI",
+        "readr",
+        "rlang",
+        "shiny",
+        "shinycssloaders"
+      ],
+      "Hash": "65498a6e24bf493513ec3228f82e8381"
     },
     "fontawesome": {
       "Package": "fontawesome",
@@ -1044,6 +1094,16 @@
         "utils"
       ],
       "Hash": "0b8a6d63c8770f02a8b5635f3c431e6b"
+    },
+    "lazyeval": {
+      "Package": "lazyeval",
+      "Version": "0.2.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "d908914ae53b04d4c0c0fd72ecc35370"
     },
     "lifecycle": {
       "Package": "lifecycle",
@@ -1742,6 +1802,20 @@
         "xtable"
       ],
       "Hash": "3a1f41807d648a908e3c7f0334bf85e6"
+    },
+    "shinycssloaders": {
+      "Package": "shinycssloaders",
+      "Version": "1.0.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "digest",
+        "glue",
+        "grDevices",
+        "shiny"
+      ],
+      "Hash": "f39bb3c44a9b496723ec7e86f9a771d8"
     },
     "sourcetools": {
       "Package": "sourcetools",
