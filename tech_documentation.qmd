@@ -1,0 +1,394 @@
+---
+format:
+  pdf: default
+toc: false
+number-sections: true
+editor: visual
+
+csl: the-lancet.csl
+bibliography: references.bib
+---
+
+```{r, include = FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(gt)
+```
+
+
+#  {.unnumbered .unlisted}
+
+\LARGE
+
+## **Individual Placement and Support Cost-Benefit Model (IPSMod): full technical documentation** {.unnumbered .unlisted}
+
+```{=tex}
+\bigskip
+\Large
+```
+### [Documentation version number 0.1.0, February 2024]{.underline} {.unnumbered .unlisted .underlined}
+
+```{=tex}
+\bigskip
+\normalsize
+```
+**Damon Morris**
+
+**Holly Clarke**
+
+**Alan Brennan**
+
+**Adam Whitworth**
+
+\bigskip
+
+**Address for correspondence**
+
+Dr Damon Morris\
+Sheffield Centre for Health and Related Research (SCHARR)\
+School of Medicine and Population Health\
+The University of Sheffield\
+Regent Court, Regent Street, Sheffield, S1 4DA, UK\
+Email: d.j.morris\@sheffield.ac.uk
+
+**License and citation**
+
+This report is licensed to The University of Sheffield under a [Creative Commons by 4.0 license](https://creativecommons.org/licenses/by/4.0/ "CC BY 4.0"). How to cite:
+
+Morris, D., Clarke, H., Brennan, A. & Whitworth, A. (2024) Individual Placement and Support Cost-Benefit Model (IPSMod): full technical documentation. Documentation version number 1.0.0. The University of Sheffield. URL: . DOI: .
+
+**Funding**
+
+Development of the tool was funded by the National Institute for Health and Care Research (NIHR) research project "IPS Beyond SMI: Maximising Individual Placement and Support (IPS) Beyond Severe Mental Illness (SMI)".
+
+```{=tex}
+\newpage
+\tableofcontents
+\newpage
+```
+# Introduction
+
+The purpose of this report is to describe the input data and methodology used to estimate the health and economic outcomes for sub-populations of individuals who are out of work (OOW) and have a mental health condition (MH), musculoskeletal (MSK) health condition, or both (MH+MSK). It also outlines the assumptions and methodologies used to estimate the impact on these outcomes of Individual Placement Support (IPS) interventions to calculate cost-benefit analysis (CBA) of the IPS intervention.
+
+## Background
+
+## Overview of model structure
+
+# Data
+
+This section summarises the key data sources used in constructing the model.
+
+## Population data
+
+The size of the working age population by local authority was taken from [Office for National Statistics](https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/datasets/locallabourmarketindicatorsforcountieslocalandunitaryauthoritiesli01). The working age population is defined as those aged 16-64.
+
+Populations are defined at the upper-tier local authority (UTLA) level, of which there are currently 152 in England. Throughout, we use the term "local authority" to refer to UTLAs. As the boundaries of some of these local authorities have changed, we process relevant data to fit a consistent set of local authorities. Some data sources are from periods with different local authority boundaries and must be adjusted to match the current boundaries. Changes to local authority boundaries which affect some of our data sources are:
+
+-   Bournemouth, Christchurch, and Poole. This unitary authority used to be two separate metropolitan districts (Bournemouth and Poole), and one non-metropolitan district (Christchurch). Where necessary, we construct the unitary authority by aggregating or taking the average across the three to produce a combined Bournemouth, Christchurch, and Poole figure.
+-   Dorset and Buckinghamshire were changed from counties to unitary authorities, and their area codes updated accordingly. In data where these areas are still classified as counties, we simply update the area codes to their unitary authority figures.
+-   Northamptonshire was split into North Northamptonshire and West Northamptonshire. For prevalence/proportions, we apply the overall figure for Northamptonshire to successor unitary authorities. For totals, we split the figure between the two in proportion to the populations of the two areas.
+
+## Public health profiles for England
+
+Prevalence data for MSK, MH, and MSK + MH are sourced from the [Office for Health Improvement and Disparities (OHID)](https://fingertips.phe.org.uk/) local profiles, processed in R/RStudio and extracted using the `fingertipsR` R package[@fingertipsR]. We obtain local authority level data on the prevalence of mental health conditions, musculoskeletal conditions, and both types of condition simultaneously.
+
+The data on prevalence of musculoskeletal conditions is taken from Indicator 93377, "Percentage reporting a long-term Musculoskeletal problem". MSK prevalence data are taken for the year 2022 and are representative of the population aged 16 or above. The data on prevalence of mental health conditions is taken from Indicator 93495, "Prevalence of Common Mental Health Disorders (% of population aged 16 & over)". The most recent year of data available for this indicator is from 2017.
+
+Our measure of the prevalence of both musculoskeletal and mental health conditions simultaneously is based on indicator 93372 -- "Long term MSK also reporting depression or anxiety." Data for this indicator are taken for the most recent available period, which is 2016/17. Unlike the prevalence figures for MH and MSK separately, the prevalence figures for this indicator relate to those aged 18 or above, rather than 16.
+
+@fig-prevalence shows the prevalence rates by local authority for each of the three health conditions.
+
+![Geographical distribution of prevalence rates for musculoskeletal, mental health, and both health conditions with deprivation quintiles](1_populations/output/all_conditions_imd.jpg){#fig-prevalence}
+
+## Family Resources Survey {#sec-frs}
+
+The Family Resources Survey (FRS) is an annual cross-sectional survey which collects detailed information about the incomes and assets of a representative sample of UK households, surveying around 20,000 individuals per year sampled across the fiscal year (April to March).
+
+The FRS is the data on which the UKMOD tax-benefit micro-simulation tool is built.
+
+## Health Survey for England {#sec-hse}
+
+The Health Survey for England (HSE) is an annual cross-sectional survey covering health and health-related behaviours. It also contains socio-economic information including age, sex, deprivation, and economic status. To derive parameters for the model, the 2019[@hse2019] HSE data was used.
+
+The HSE data are used to estimate the non-employment rates of individuals with MSK, MH, and MSK+MH health conditions. These rates are combined with the local authority-level population data to calculate the number of non-employed individuals with each health condition to establish the size of the population which receives the IPS intervention.
+
+## Understanding Society: The UK Household Longitudinal Study {#sec-usoc}
+
+The Understanding Society (USoc hereafter) dataset is a longitudinal survey of UK households which has run for 13 waves (as of November 2023). The data collected by the survey is wide in scope and includes health and well-being, income, education, labour market outcomes, and attitudes/beliefs. The USoc data is used to estimate the health utility gains from moving into work (@sec-utilities). These data are used because the longitudinal nature of the data make it possible to follow individuals over time transitioning between employment states and changes in their self-reported health utility.
+
+Econometric panel data techniques are used to estimate the health utility gain from moving into employment while controlling for confounding observable factors and unobserved time-invariant individual heterogeneity.These estimates are used to adjust the baseline non-employment health utilities estimated from the HSE data into the health utilities for those same individuals if they were to gain employment.
+
+![Structure of the Labour Force Survey quarterly and longitudinal datasets](img/lfs-structure.png){#fig-lfs}
+
+## Labour Force Survey
+
+The Labour Force Survey (LFS) is a long-running representative survey of all individuals in the UK that has taken place every quarter since 1992. It contains detailed demographic information about the respondents, and detailed data on individuals' educational qualifications, employment status, occupation and industry of employment, spells of unemployment, hours worked, and earnings.
+
+The LFS is released as quarterly cross-sectional datasets, but the survey design also incorporates a staggered longitudinal element. Each quarter, a new wave of respondents is interviewed and then followed up for four successive quarters for a total of five quarters. In addition to the quarterly cross-sectional data, longitudinal datasets are released for each cohort of longitudinal respondents. In any one quarter, the LFS survey sample contains five longitudinal cohorts, each at a different wave of participation in the survey. @fig-lfs illustrates the structure of the LFS datasets.
+
+The use of the LFS longitudinal data allows us to observe the same individuals at five distinct time points, each located 13 weeks from the previous, and so covering a time span of one year. We make use of the longitudinal data to calculate the probability of transitions between employment states for different population subgroups (@sec-bau)
+
+# Methods
+
+In this section we describe the methods used to construct the CBA model, beginning with an overview of the model structure and components in @sec-overview. The model structure is summarised in @fig-model. There are six key components to paramaterising and constructing the model:
+
+1.  Identifying the non-employed population with health conditions of interest by local area (@sec-definepop).
+2.  Derive EQ-5D health utilities for in-work and out-of-work individuals by health condition (@sec-utilities).
+3.  Construct income, tax, and benefit profiles for in-work and out-of-work individuals by health condition (@sec-taxben).
+4.  Calculate other financial costs and benefits associated with employment and non-employment (@sec-othercosts).
+5.  Model labour market transitions for initially non-employed individuals with health conditions (@sec-bau).
+6.  Model labour market transitions under the IPS intervention (@sec-ips).
+
+## Overview {#sec-overview}
+
+The model takes an initial population which is a cohort of individuals with a given health condition who are out of work. The model then simulates the progress of this cohort through the labour market over a period of five years. Labour market progression is modelled as a Markov process by which at a given time point individuals are in one of two labour market states - employed or non-employed - and between time $t$ and $t+1$ there are probabilities of either remaining in the current state or moving to another one. 
+
+As the transition probabilities are calculated using longitudinal LFS data, in which individuals are surveyed quarterly, the model is built using time steps of one quarter in length. At each time step, the model records the number of individuals in each state. The size of the cohort is assumed to remain constant over the five year time horizon and there are no absorbing states (i.e. no one dies or retires).
+
+At each time point key outcomes are associated with each labour market state, and costs and benefits are aggregated to the total number of individuals in the state at that time. The key health outcome is quality adjusted life-years (QALYs) measured by the EQ-5D, which is valued according to the willingness to pay for a QALY in line with the Green Book[@greenbook]. In terms of financial benefits, for each health condition the model includes a profile of average income, taxes paid, and benefits received by those who are employed and those who are non-employed. Also included are other financial costs and benefits associated with employment, including transport costs and childcare. The value of the outcomes are summed across all time points and employment states for the BAU arm and for the intervention arm and compared in the cost-benefit analysis.    
+
+![Overview of the structure of the IPS CBA model](img/model-structure.png){#fig-model}
+
+The impact of the IPS intervention in the model operates through the transition probabilities. Receiving the IPS intervention makes transitions into (or remaining in) non-employment less likely. Outcomes such as QALYs, taxes, benefits, and income are assumed to be unaffected by the IPS i.e. the income, tax, and benefit profile and QALY's for someone with a given health condition and employment status are the same in each arm. Differences between intervention and BAU arise because of different distributions of individuals across the two employment states.
+
+
+## Defining the Eligible Population {#sec-definepop}
+
+The eligible population to receive the intervention consists of those of working age who (i) have either a musculoskeletal condition and/or a mental health condition and (ii) are not employed. To construct the eligible population for a given local authority we obtain the total population of the local authority and adjust this figure for the prevalence of the health condition and the non-employment rate of individuals with that health condition. This calculation and the data sources used are summarised in @fig-population.
+
+![Calculating the eligible population to receive the IPS intervention](img/population.png){#fig-population}
+
+### Calculating the population with a health condition
+
+We calculate the number of individuals, $N_{(k,h)}$, from local authority $k$ with a given health condition $h$ (where $h$ is either MSK, MH, or MSK+MH) by multiplying the local authority level prevalence of that health condition, $\rho_{(k,h)}$, obtained from the OHID local authority profiles by the total number of working age individuals in the local authority obtained from ONS, $N_k$:
+
+$$
+N_{k,h} = N_k*ρ_{k,h}
+$$ {#eq-num}
+
+### Calculating the population with a health condition and OOW
+
+We obtain non-employment rates by health condition from the Health Survey for England 2018 data. The HSE data does not contain local authority identifies, so we calculate these at the population level as the weighted mean of a dummy variable equal to one for an individual who is not in employment and zero otherwise. The non-employment rate for health condition $h$, $\omega_h$, is multiplied by the local authority population with the health condition, $N_{(k,h)}$, calculated from @eq-num:
+
+$$
+N_{k,h,oow} = N_{k,h}*\omega_h=N_k (ρ_{k,h}*\omega_h)
+$$ {#eq-numoow}
+
+The $\omega_h$ are calculated from the Health Survey for England 2018 data and presented in @tbl-nonemprates. Note that the non-employment rates do not vary by local authority - an aggregate figure is calculated for England and applied to all local authority populations.
+
+```{r}
+#| echo: false
+#| label: tbl-nonemprates
+#| tbl-cap: "Non-employment rates by health condition."
+
+read.csv("1_populations/output/non_employment_rates.csv") %>%
+  select(Pop,MSK,MH,`MSK...MH`) %>%
+  rename(`MSK + MH` = `MSK...MH`,
+         `Population` = `Pop`) %>%
+  gt() %>%
+  fmt_percent(columns = everything())
+
+```
+
+## Modelling Health Utilities {#sec-utilities}
+
+### The EQ-5D
+
+To measure individual health-related quality of life we use the EQ-5D to construct a health utility which can be used to calculate quality-adjusted life-years (QALYs). The EQ-5D scores responses to descriptions of health under five headings; mobility, self-care, usual activities, pain/discomfort, and anxiety/depression. There are two versions of the EQ-5D; the EQ-5D-3L and EQ-5D-5L, which differ in the number of responses which can be chosen from under each dimension. The EQ-5D-3L defines 243 possible health states compared to 3,125 possible health states in the EQ-5D-5L.
+
+Responses to the EQ-5D questionnaire can be combined into a single health utility be applying an algorithm to the responses to produce a value with a maximum value of one (indicating perfect health) and including zero which is a state equivalent to death. Values less than zero are also possible, which are interpreted as states worse than death. Values for each health state are obtained by surveying a representative sample of the general population and using experimental methods to elicit values for health states defined by samples of possible combinations of responses to the five dimensions of the EQ-5D. Statistical models are then used to develop an algorithm for scoring the health utility for any of the 3,125 possible health states defined by responses to the five dimensions[@devlin2018].
+
+### Calculating EQ-5D utilities
+
+The model requires EQ-5D utilities for six unique health states: one each for the MSK, MH, and MSK+MH sub-populations, separately for out of work (OOW) and in-work (IW) individuals. We use data from the Health Survey for England (@sec-hse) 2019 dataset to obtain health utilities for OOW MSK, MH, and MSK+MH health condition groups. 
+
+While we can observe individuals in the HSE data who are IW cannot use their utilities as an estimate of the utility gain from the OOW transitioning into employment. This is because the individuals in the IW group will differ from the OOW group and as the HSE data are cross-sectional we cannot observe the same individuals moving in and out of employment to estimate the utility gains from entering employment. If the IW group differ from the OOW in terms of unobservable characteristics that are correlated with EQ-5D, comparing the two groups in a cross-sectional setting will give a biased estimate of the utility gain from transitioning into work. We therefore use the Understanding Society data, which is longitudinal and contains data on both health and work, to estimate the change in utility when individuals move between employment states. 
+
+### Estimating the health utility gain from transitioning into employment
+
+The Understanding Society (@sec-usoc) longitudinal data are used to estimate the average EQ-5D utility gain from those who move from non-employment into employment in the general population. The equation to be estimated is given in @eq-utility, where $U_{it}$ is the health utility of individual $i$ at time $t$ measured by EQ-5D. $U_{it}$ is a function of employment status $EMPL_{it}$ (a binary variable equal to 1 if employed or self-employed, 0 otherwise), and a set of control variables $X_{it}$ which consists of age, sex, index of multiple deprivation (IMD) quintile, marital status, an indicator for if the individual considers themselves to have a disability, and time indicators. 
+
+$$
+U_{it} = \alpha + \beta EMPL_{it} + \delta X_{it} + \mu_i + \epsilon_{it}
+$${#eq-utility}
+
+The model contains an error term with two components, ($\mu_i + \epsilon_{it}$). The first, $\mu_i$, is an individual level time-invariant error and the second is both time and individual-varying, and assumed to be normally distributed with a mean of zero. The fixed-effects estimator applies a time-demeaning transformation to the equation, where for each individual i at time t the mean of the variable over time at the individual level is subtracted:
+
+$$
+U_{it} - \bar{U}_{i} = \alpha + \beta(EMPL_{it} - \bar{EMPL}_{i}) + \delta(X_{it} - \bar{X}_{i}) + (\epsilon_{it} - \bar{\epsilon}_{i})
+$${#eq-fe}
+
+$$
+\ddot{U}_{it} = \alpha + \beta \ddot{EMPL}_{it} + \delta \ddot{X}_{it} + \ddot{\epsilon}_{it}
+$${#eq-fe2}
+
+
+@eq-fe2 is the time de-meaned equation which eliminates the $\mu_i$ term from @eq-utility. Under the assumption that all confounding factors correlated with both health and employment are captured in either the observables ($X_{it}$) or the unobserved individual-specific time-invariant error ($\mu_i$), @eq-fe2 can be estimated consistently by Ordinary Least Squares (OLS) to produce an unbiased estimate of the impact of employment on health, $\beta$.This method allows us to observe the mean change in utility observed when a given individual transitions from non-employment into employment.
+
+The Understanding Society data waves 1-13 were used for the analysis. EQ-5D health utilities are not directly available in the Understanding Society data, and so we obtained EQ-5D estimates by mapping from responses to the 12-item Short Form survey, SF-12, using a previously published mapping algorithm[@gray2006]. Note that this algorithm is a mapping to the EQ-5D-3L, rather than EQ-5D-5L which is our main measure of health utility. The data were prepared and cleaned, including the mapping from SF-12 to EQ-5D using the `ukhlsclean` R package[@ukhlsclean]. 
+
+We use the estimate of the utility gain from moving into employment from the USoc regressions to estimate the counter-factual health utility for the same OOW population subgroups in the HSE data if they were to gain employment. The resulting utilities are presented in @tbl-utilities. 
+
+```{r}
+#| echo: false
+#| label: tbl-utilities
+#| tbl-cap: "Estimated EQ-5D utilities by health condition and employment status."
+
+read.csv("4_eq5d_health_utilities/output/eq5d5l-health-utilities-v1.csv") %>%
+  select(population, oow, iw) %>%
+  mutate(oow = round(oow,3),
+         iw = round(iw,3)) %>%
+  pivot_longer(c("oow","iw"), names_to = "Employment Status", values_to = "value") %>%
+  pivot_wider(id_cols = `Employment Status`, names_from = "population", values_from = "value") %>%
+  mutate(`Employment Status` = c("Out-of-work (OOW)","In-work (IW)")) %>%
+  rename(`MSK + MH` = `MH+MSK`) %>%
+  gt()
+
+```
+
+The utilities in @tbl-utilities are applied to the number of individuals in the respective health state and employment state at each time point in the model, converted to QALYs by multiplying by 0.25 to adjust the annual figure to quarterly and then multiplied by the number of people in the employment state. To measure the health outcome in financial terms, each QALY is given a value of £70,000 in 2020/21 prices, in line with the Green Book recommendations on programme appraisals which include QALYs[@greenbook]. 
+
+## Modelling Tax and Benefits {#sec-taxben}
+
+### UKMOD
+
+To model the fiscal impact of changes in employment and earnings we use UKMOD[@richiardi2019], an open-source tax-benefit microsimulation model for the UK maintained by the Centre for Microsimulation and Policy Analysis (CeMPA). The model is based on input data from the Family Resources Survey (FRS). UKMOD version B1.09 is used to model the income, tax, and benefit outcomes. This version was released on 24th November 2023, updated to incorporate the changes announced in the Autumn Statement.
+
+### Modelling approach
+
+To model the income, tax, and benefit outcomes for each of the sub-populations of interest we construct an input dataset for UKMOD from the FRS using the [`frsclean`](https://github.com/djmorris1989/frsclean) R package[@frsclean] version 1.0.2. We then construct three filtered versions of the dataset, one each for the MSK, MH, and MSK+MH sub-populations. Each is then further divided into an in-work (IW) (employees, employers, self-employed) and an out-of-work (OOW) dataset, to model outcomes for both employment states in the cost-benefit analysis for each of the three health conditions.
+
+The six UKMOD model runs are:
+
+-   `B1.09_MSK_OOW`
+-   `B1.09_MH_OOW`
+-   `B1.09_MSK_MH_OOW`
+-   `B1.09_MSK_IW`
+-   `B1.09_MH_IW`
+-   `B1.09_MSK_MH_IW`
+
+The IW group are modelled as a counterfactual group to estimate the income, tax, and benefit profile of an OOW individual who subsequently gains employment. A simple cross-sectional comparison of those in-work with those out-of-work at a particular point in time is unlikely, however, to provide an accurate estimate of the impact of an OOW individual transitioning into work, as the two populations in the data will differ by both observable and unobservable characteristics. 
+
+We therefore filter the IW population further using additional variables in the FRS. We select the subset of the IW group with a particular health condition who have i) been in their current job for less than 365 days (i.e., 1 year), and ii) prior to their current job were not employed. This produces a more relevant counterfactual group to those who are OOW - individuals who are in work but are within a year of having been previously out of work. The additional 3 UKMOD model runs which apply this additional filtering are labelled as:
+
+-   `B1.09_MSK_IW_1yr`
+-   `B1.09_MH_IW_1yr`
+-   `B1.09_MSK_MH_1yr`
+
+The data used as the input to UKMOD are the pooled FRS datasets for the fiscal years 2018/19 to 2021/22. Data are pooled to maximise the number of potential observations for the IW (\<1yr) subgroups, which when combined with filtering by health condition produces small numbers of observations. All monetary variables are adjusted for inflation to 2021 prices using the consumer price index (CPIH). Monetary values are then automatically uprated by UKMOD to 2023 prices when applying the 2023 tax and benefit system.
+
+
+![UKMOD summary outputs for average monthly earnings, benefits, and taxes by health condition and work status](5_ukmod_data_inputs/output/taxben_summary_plot.png){#fig-taxbenout}
+
+The output of each model run is a detailed breakdown of total market incomes (split between employment and non-employment related income), total benefit payments (separately for each benefit in the model), and total income tax receipts for the population modelled. Each variable is divided by the total subgroup population size to obtain a subgroup average for each variable.
+
+### Modelled Parameters for Income, Tax, and Benefits
+
+@fig-taxbenout presents summary output from the UKMOD model runs for average monthly earnings (from employment and self-employment), benefit payments, and direct taxes (defined as income tax plus council tax, not including national insurance contributions).
+
+The horizontal axis indicates the joint health condition / work status and presents results for both the full IW sample and the IW sample restricted to the IW sample who have been in work for less than 1 year. For each subpopulation, the sample size from which the estimates were derived is reported. The sample restriction of the IW group leads to a substantial reduction in the estimate of average gross monthly earnings for the IW group for each health condition. The estimate is 69.8% of the full IW sample figure for the MSK group (£1,485 vs £2,126), 67.9% for the MH group (£1,403 vs £2,065), and 59.5% (£1,035 vs £1,738) for the MSK+MH group. The same pattern is observed for income tax receipts, which are substantially lower when using the IW \< 1yr group compared to the full IW group due to the smaller estimated average earnings figures.
+
+
+Correspondingly, the estimated average benefit receipt is larger when considering the IW \< 1yr group compared to the full IW sample. In the case of the MH group, average benefit receipt is almost double (£131 vs £66) and is 66% for the MSK+MH group (£166 vs £100). This is also true of the MSK group, though the relative difference is much smaller at 8.7% (£75 vs £69). Higher average benefit receipt is related to lower earnings through increased eligibility for in-work benefits i.e., tax credits. Note that the sample sizes are small for the IW \< 1yr groups, particularly for MSK and MSK+MH where the calculations are based on sample sizes of less than 100 across the four pooled FRS datasets.
+
+The income, tax, and benefit profiles used in the model are summarised in @tbl-taxben. The OOW row are used for the non-employed profiles and the IW (1yr) previously non-employed row for the employed profiles. The IW row shows the UKMOD outputs when there is no filtering of the in-work group in the FRS data and IW (1yr) restricts to those in their current job for less than one year, but may not have been non-employed prior to the current job. 
+
+While UKMOD reports a detailed breakdown of income, tax, and benefits, the columns of @tbl-taxben report the aggregated inputs used in the IPS model. The benefits columns sums up all means tested, non-means tested and pension benefits. Disposable income is income left to the individual after taxes and pension contributions. Tax is disaggregated into direct taxes (income tax plus council tax), employee/self-employed national insurance contributions (NICs), and employer NICs.
+
+\begingroup
+
+\fontsize{10pt}{12pt}\selectfont
+\addtolength{\tabcolsep}{-3pt}
+
+```{r}
+#| echo: false
+#| label: tbl-taxben
+#| tbl-cap: "Modelled Income, Tax, and Benefits by UKMOD B1.09."
+
+readxl::read_excel("5_ukmod_data_inputs/output/UKMOD_output.xlsx", 
+                           range = "C5:M17") %>%
+  mutate(health_condition = c(rep("Musculoskeletal conditions (MSK)",4),
+                              rep("Mental health conditions (MH)",4),
+                              rep("Musculoskeletal & mental health conditions (MSK + MH)",4) )) %>%
+  filter(Description %in% c("OOW","IW (1yr) previously non-employed")) %>%
+  mutate(Description = ifelse(Description == "OOW", "Non-Employed / OOW", "Employed / IW")) %>%
+  select(c(health_condition,`Description`,
+           `All benefits`,
+           `direct tax (income tax + council tax)`,
+           `employee/self-employed national insurance`,
+           `Employer national insurance`,
+           `disposable income`)) %>%
+  rename(`Employment Status` = `Description`,
+         `Benefits` = `All benefits`,
+         `Direct tax` = `direct tax (income tax + council tax)`,
+         `NICs (Employee)` = `employee/self-employed national insurance`,
+         `NICs (Employer)` = `Employer national insurance`,
+         `Disposable Income` = `disposable income`) %>%
+  mutate(`Benefits` = round(`Benefits`,0),
+         `Direct tax` = round(`Direct tax`,0),
+         `NICs (Employee)` = round(`NICs (Employee)`,0),
+         `NICs (Employer)` = round(`NICs (Employer)`,0),
+         `Disposable Income` = round(`Disposable Income`,0)) %>%
+  gt(rowname_col = "Employment Status",
+     groupname_col = "health_condition") %>%
+  #cols_width(
+  #  `Employment Status` ~ px(200),
+  #  everything() ~ px(90)
+  #) %>%
+  fmt_currency(currency = "pound",
+               decimals = 0)
+
+```
+
+\endgroup
+
+
+## Other Financial Costs and Benefits {#sec-othercosts}
+
+### Transport costs 
+
+### Childcare costs
+
+## Modelling business-as-usual (BAU) labour market transitions {#sec-bau}
+
+We model the labour market transitions of the target populations over five years using the LFS longitudinal data. We use 27 longitudinal datasets covering starting quarters in wave 1 of Q2 2012 to Q4 2018. These datasets cover the period of time for which health condition information is available in the quarterly LFS data. 
+
+As the longitudinal data are available quarterly for five quarters, we use the first wave of participation in the survey to identify the population of interest (non-employed and report MSK and/or MH conditions) and waves two to five to determine quarterly transitions between employment and non-employment. For years 2 to 5 we extrapolate further transitions in employment status using the probabilities derived from the data. 
+
+### Year One
+
+### Years Two to Five
+
+## Modelling the IPS intervention scenario {#sec-ips}
+
+### The Health-Led Employment Trials
+
+### Adjusting transition probabilities for treatment effects
+
+The IPS intervention arm in the model was constructed by calibrating the BAU arms to match results from the Health Led Employment (HLE) Trials Evaluation. This trial showed that at the 12-month point, 25% were in work. The trial did not have information on the benefit group split of the trial. IPS arms were constructed by finding a calibration factor that could be applied to all 5 versions of the model, that created a combined result of 25% of people in employment at 12 months (at the end of wave 5).
+
+## Cost-Benefit Analysis {#sec-cba}
+
+# Results
+
+## Using the IPSMod Tool
+
+## Base Case Analysis
+
+## Sensitivity Analysis
+
+```{=tex}
+\newpage
+```
+
+# References {.unnumbered}
+
+::: {#refs}
+:::
+
+```{=tex}
+\newpage
+```
+
+# Appendix {.unnumbered .appendix}
+
+## A1. Health Utility Regressions {.unnumbered .appendix}
