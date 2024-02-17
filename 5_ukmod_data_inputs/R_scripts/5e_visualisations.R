@@ -32,7 +32,7 @@ ggplot(sample_size) +
 
 #### read in UKMOD output 
 
-ukmod_data <- readxl::read_excel("output/UKMOD_output2.xlsx", range = "C5:M17") %>%
+ukmod_data <- readxl::read_excel("5_ukmod_data_inputs/output/UKMOD_output2.xlsx", range = "C5:M17") %>%
   select(Description, `All benefits`, `Earnings (part of original income)`, `disposable income`,
          `All benefits`, `direct tax (income tax + council tax)`) %>%
   rename(status = Description,
@@ -150,6 +150,6 @@ ggplot(plot_data) +
        x = "",
        caption = "OOW: out of work, IW: in work, MSK: musculoskeletal, MH: mental health \n\nSource: Family Resources Survey 2018/19 - 2021/22")
 
-ggsave("output/taxben_summary_plot.png")
+ggsave("5_ukmod_data_inputs/output/taxben_summary_plot.png")
 
 
