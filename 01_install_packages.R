@@ -34,5 +34,5 @@ devtools::install_git(
 
 devtools::install_git(
   "https://github.com/STAPM/lfsclean.git",
-  ref = "1.1.1",
+  ref = "1.1.2",
   build_vignettes = FALSE)

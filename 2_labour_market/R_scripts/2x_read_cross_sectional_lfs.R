@@ -1,6 +1,6 @@
 
-library(data.table)
-library(lfsclean)
+source("03_load_packages.R")
+
 
 root <- ""
 file <- here::here("data/labour_force_survey_xsection")
