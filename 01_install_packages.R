@@ -29,3 +29,10 @@ devtools::install_git(
   "https://github.com/STAPM/ukhlsclean.git",
   ref = "1.0.1",
   build_vignettes = FALSE)
+
+### Install lfsclean from the STAPM github 
+
+devtools::install_git(
+  "https://github.com/STAPM/lfsclean.git",
+  ref = "1.1.1",
+  build_vignettes = FALSE)
