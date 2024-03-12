@@ -362,17 +362,23 @@ As the longitudinal data are available quarterly for five quarters, we use the f
 
 ### The Health-Led Employment Trials
 
+### Adjusting the BAU population for disability
+
 ### Adjusting transition probabilities for treatment effects
 
 The IPS intervention arm in the model was constructed by calibrating the BAU arms to match results from the Health Led Employment (HLE) Trials Evaluation. This trial showed that at the 12-month point, 25% were in work. The trial did not have information on the benefit group split of the trial. IPS arms were constructed by finding a calibration factor that could be applied to all 5 versions of the model, that created a combined result of 25% of people in employment at 12 months (at the end of wave 5).
 
+### Adjusting health utilities for treatment effects
+
+### Allowing for differential performance
+
 ## Cost-Benefit Analysis {#sec-cba}
+
+## Validation {#sec-validation}
 
 # Results
 
-## Using the IPSMod Tool
-
-## Base Case Analysis
+## Use Case
 
 ## Sensitivity Analysis
 
