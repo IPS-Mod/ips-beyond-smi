@@ -26,6 +26,7 @@ folder_paths <- c("1_populations",
                   "data/family_resources_survey",
                   "data/health_survey_for_england",
                   "data/labour_force_survey",
+                  "data/labour_force_survey_xsection",
                   "data/understanding_society")
 
 sapply(folder_paths, function(fpath) {
