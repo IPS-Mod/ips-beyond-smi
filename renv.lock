@@ -133,11 +133,12 @@
     },
     "Matrix": {
       "Package": "Matrix",
-      "Version": "1.5-4.1",
+      "Version": "1.6-5",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R",
+        "grDevices",
         "graphics",
         "grid",
         "lattice",
@@ -145,7 +146,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "38082d362d317745fb932e13956dccbb"
+      "Hash": "8c7115cd3a0e048bda2a7cd110549f7a"
     },
     "MatrixModels": {
       "Package": "MatrixModels",
@@ -1781,19 +1782,19 @@
     },
     "lfsclean": {
       "Package": "lfsclean",
-      "Version": "1.1.1",
+      "Version": "1.1.2",
       "Source": "Git",
       "RemoteType": "xgit",
       "RemoteUrl": "https://github.com/STAPM/lfsclean.git",
-      "RemoteRef": "1.1.1",
-      "RemoteSha": "574c740688cd0c3c7adc92a86c1f8c79f2768790",
+      "RemoteRef": "1.1.2",
+      "RemoteSha": "98843110ff2c9c846665534619e6436968da7341",
       "Requirements": [
         "R",
         "data.table",
         "dplyr",
         "zoo"
       ],
-      "Hash": "42c9724f80df4c5a0814dfe3a3105f81"
+      "Hash": "312c9aabf4036b8517cbd60e8123352f"
     },
     "lifecycle": {
       "Package": "lifecycle",
