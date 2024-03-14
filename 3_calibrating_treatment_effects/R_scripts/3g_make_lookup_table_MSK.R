@@ -1,7 +1,7 @@
 source("03_load_packages.R")
 
-path <- "C:/Users/cm1djm/Documents/Data/"
-file <- "tree with health condition split2 ABr DM"
+path <- "X:/HAR_PR/PR/IPS_beyond_SMI_NIHR202996/General/CBA Tool/Tool Template Drafts/"
+file <- "tree with health condition split2 ABr"
 health <- c("MSK","MH","MSK + MH")
 
 ### Increase the calibration factor (c) by a multiplier (m) to produce different
@@ -20,7 +20,7 @@ health <- c("MSK","MH","MSK + MH")
 ### -1 - adjusts for the full difference of (c - 0), full employment 
 
 
-multiplier_vector <- seq(-1,1,0.001)
+multiplier_vector <- seq(-1,1,0.01)
 
 
 health_condition <- health[1]
@@ -168,7 +168,7 @@ out16_UEEEE <- ((1 - prob_U) * (1 - prob_UE) * (1 - prob_UEE) * (1 - prob_UEEE) 
 EmpAt12mth <- sum(out02_UUUUE, out04_UUUEE, out06_UUEUE, out08_UUEEE,
                   out10_UEUUE, out12_UEUEE, out14_UEEUE, out16_UEEEE)
 
-data <- data.table(calib_U,multiplier,EmpAt12mth)
+data <- data.table(calib_U,calib_E1,calib_E2,calib_E3,multiplier,EmpAt12mth)
 
 if (i == 1){
   data_out <- copy(data)
@@ -187,41 +187,72 @@ EmpAt12mthBAU <- suppressMessages( as.numeric(readxl::read_excel(paste0(path,fil
 ggplot(data_out) +
   aes(x = multiplier, y = EmpAt12mth) +
   geom_line(linewidth = 1) +
-  geom_hline(yintercept = EmpAt12mthTRT, linetype = 2, linewidth = 1, color = "#bc4749") +
-  geom_hline(yintercept = EmpAt12mthCTL, linetype = 2, linewidth = 1, color = "#a7c957") +
-  geom_hline(yintercept = EmpAt12mthBAU, linetype = 2, linewidth = 1, color = "#386641") +
+  geom_hline(yintercept = EmpAt12mthTRT, linetype = 2, linewidth = 1, color = "#007f5f") +
+  geom_hline(yintercept = EmpAt12mthCTL, linetype = 2, linewidth = 1, color = "#55a630") +
+  geom_hline(yintercept = EmpAt12mthBAU, linetype = 2, linewidth = 1, color = "#aacc00") +
   theme_minimal() +
   scale_x_continuous(breaks = seq(-1,1,0.2)) +
   scale_y_continuous(breaks = seq(0,1,0.2), labels = scales::percent) +
   labs(y = "Employment rate at 12 months",
        x = "Multiplier") +
-  expand_limits(y = 0) 
+  expand_limits(y = 0) +
+  annotate("text", x = -0.7, y = EmpAt12mthTRT + 0.03, color = "#007f5f", size = 3, 
+           label = paste0("Trial Treatment arm = ",round(EmpAt12mthTRT*100,2),"%")) +
+  annotate("text", x = -0.1, y = EmpAt12mthCTL - 0.03, color = "#55a630", size = 3, 
+           label = paste0("Trial Control arm = ",round(EmpAt12mthCTL*100,2),"%"))  +
+  annotate("text", x = -0.8, y = EmpAt12mthBAU + 0.03, color = "#aacc00", size = 3, 
+           label = paste0("LFS = ",round(EmpAt12mthBAU*100,2),"%"))
+ggsave("3_calibrating_treatment_effects/output/MSK_multiplier_v_empl.png")
 
-ggplot(data_out) +
-  aes(x = calib_U, y = EmpAt12mth) +
+data_out %>%
+  select(EmpAt12mth,calib_U,calib_E1,calib_E2,calib_E3) %>%
+  pivot_longer(cols = c("calib_U","calib_E1","calib_E2","calib_E3"), names_to = "calib_factor", values_to = "value") %>%
+  mutate(calib_factor = factor(calib_factor,
+                               levels = c("calib_U","calib_E1","calib_E2","calib_E3"),
+                               labels = c("Non-employed","Employed 1q","Employed 2q","Employed 3q"))) %>%
+ggplot() +
+  aes(x = value, y = EmpAt12mth, color = calib_factor) +
   geom_line(linewidth = 1) +
-  geom_hline(yintercept = EmpAt12mthTRT, linetype = 2, linewidth = 1, color = "#bc4749") +
-  geom_hline(yintercept = EmpAt12mthCTL, linetype = 2, linewidth = 1, color = "#a7c957") +
-  geom_hline(yintercept = EmpAt12mthBAU, linetype = 2, linewidth = 1, color = "#386641") +
+  geom_hline(yintercept = EmpAt12mthTRT, linetype = 2, linewidth = 1, color = "#007f5f") +
+  geom_hline(yintercept = EmpAt12mthCTL, linetype = 2, linewidth = 1, color = "#55a630") +
+  geom_hline(yintercept = EmpAt12mthBAU, linetype = 2, linewidth = 1, color = "#aacc00") +
   theme_minimal() +
   scale_x_continuous(breaks = seq(-1,1,0.1)) +
   scale_y_continuous(breaks = seq(0,1,0.2), labels = scales::percent) +
   labs(y = "Employment rate at 12 months",
-       x = "Calibration factor \n(Prob(Non-Emp -> Emp))")  +
-  expand_limits(y = 0) 
+       x = "Calibration factor for probability of non-employment",
+       color = "Calibration")  +
+  expand_limits(y = 0)  +
+  scale_color_manual(values = c("#ff4000","#4f000b","#720026","#ce4257")) +
+  expand_limits(y = 0) +
+  annotate("text", x = 0.2, y = EmpAt12mthTRT + 0.03, color = "#007f5f", size = 3, 
+           label = paste0("Trial Treatment arm = ",round(EmpAt12mthTRT*100,2),"%")) +
+  annotate("text", x = 0.5, y = EmpAt12mthCTL - 0.03, color = "#55a630", size = 3, 
+           label = paste0("Trial Control arm = ",round(EmpAt12mthCTL*100,2),"%"))  +
+  annotate("text", x = 0.5, y = EmpAt12mthBAU + 0.03, color = "#aacc00", size = 3, 
+           label = paste0("LFS = ",round(EmpAt12mthBAU*100,2),"%")) 
+ggsave("3_calibrating_treatment_effects/output/MSK_calib_v_empl.png")
 
-ggplot(data_out) +
-  aes(x = multiplier, y = calib_U) +
+
+
+data_out %>%
+  select(multiplier,calib_U,calib_E1,calib_E2,calib_E3) %>%
+  pivot_longer(cols = c("calib_U","calib_E1","calib_E2","calib_E3"), names_to = "calib_factor", values_to = "value") %>%
+  mutate(calib_factor = factor(calib_factor,
+                               levels = c("calib_U","calib_E1","calib_E2","calib_E3"),
+                               labels = c("Non-employed","Employed 1q","Employed 2q","Employed 3q"))) %>%
+ggplot() +
+  aes(x = multiplier, y = value, color = calib_factor) +
   geom_line(linewidth = 1) +
-  geom_hline(yintercept = calib_U_trt,  linetype = 2, linewidth = 1, color = "#bc4749") +
-  geom_hline(yintercept = calib_U_ctrl, linetype = 2, linewidth = 1, color = "#a7c957") +
-  geom_hline(yintercept = 1,            linetype = 2, linewidth = 1, color = "#386641") +
+  geom_vline(xintercept = 0, linetype = 2) +
   theme_minimal() +
   scale_x_continuous(breaks = seq(-1,1,0.2)) +
   scale_y_continuous(breaks = seq(0,1,0.1)) +
   labs(x = "Multiplier",
-       y = "Calibration factor \n(Prob(Non-Emp -> Emp))") +
-  expand_limits(y = 0) 
+       y = "Calibration factor for probability of non-employment",
+       color = "Calibration") +
+  scale_color_manual(values = c("#ff4000","#4f000b","#720026","#ce4257"))
+ggsave("3_calibrating_treatment_effects/output/MSK_calib_v_multiplier.png")
 
 ##############################################################################################
 ##### create lookup table, remove duplicate employment rate observations (when rounded to 0)
@@ -234,6 +265,9 @@ lkup <- data_out %>%
 ref <- data.table(EmpAt12mth = seq(min(lkup$EmpAt12mth),1,0.01))
 
 lkup_table <- merge(ref, lkup, by = "EmpAt12mth", all.x = TRUE)  %>%
-  mutate(multiplier_imp = na.approx(multiplier))
+  mutate(multiplier_imp = round(na.approx(multiplier),3)) %>%
+  select(EmpAt12mth,multiplier_imp)
+
+saveRDS(lkup_table,"3_calibrating_treatment_effects/intermediate_data/performance_multipliers_msk.rds")
 
 
