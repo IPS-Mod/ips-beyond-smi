@@ -1,7 +1,7 @@
 source("03_load_packages.R")
 
-path <- "C:/Users/cm1djm/Documents/Data/"
-file <- "tree with health condition split2 ABr DM"
+path <- "X:/HAR_PR/PR/IPS_beyond_SMI_NIHR202996/General/CBA Tool/Tool Template Drafts/"
+file <- "IPS Tool user friendly"
 health_condition <- c("MSK","MH","MSK + MH")[1]
 
 ### Increase the calibration factor (c) by a multiplier (m) to produce different

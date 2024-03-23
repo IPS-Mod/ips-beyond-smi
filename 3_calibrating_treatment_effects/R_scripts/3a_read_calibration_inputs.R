@@ -1,7 +1,7 @@
 ### load input parameters for the simulation
 
 path <- "X:/HAR_PR/PR/IPS_beyond_SMI_NIHR202996/General/CBA Tool/Tool Template Drafts"
-file <- "/tree with health condition split"
+file <- "/IPS Tool V2 calibration testing"
 
 ##############################################################################
 ## read in the probabilities from the BAU individual benefit group trees 
@@ -59,7 +59,7 @@ for (b in 1:length(health_condition)){
 
 ### HLE Trial
 
-HLE        <- as.vector(as.matrix(readxl::read_excel(paste0(path,file,".xlsx"), sheet = paste0("Health Condition Group Size"), range = "B14:D14", col_names = FALSE)))
+HLE        <- as.vector(as.matrix(readxl::read_excel(paste0(path,file,".xlsx"), sheet = paste0("Health Condition Group Size"), range = "B52:D52", col_names = FALSE)))
 
 
 ########################################################
@@ -79,7 +79,7 @@ BAU_PROB_at12mth_empl = as.numeric(readxl::read_excel(paste0(path,file,".xlsx"),
 BAU_PROB_in12mth_empl = as.numeric(readxl::read_excel(paste0(path,file,".xlsx"), sheet = paste0("Tree Total Health Condition"), range = "AC17:AC17", col_names = FALSE))
 
 
-### Proportion of people never in employed at the LFS survey data who did work in between
+### Proportion of people never in employment at the LFS survey data who did work in between
 ### interview dates
 
 nonemp_emprate = c(as.numeric(readxl::read_excel(paste0(path,file,".xlsx"), sheet = paste0("Tree MSK"),      range = "AE5:AE5", col_names = FALSE)),
