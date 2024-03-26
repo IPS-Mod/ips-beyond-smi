@@ -4,9 +4,8 @@ start <- Sys.time()
 
 health <- c("MSK","MH","MSK + MH")
 
-path <- "C:/Users/cm1djm/Documents/input sheet loop test/"
+path <- "X:/HAR_PR/PR/IPS_beyond_SMI_NIHR202996/General/CBA Tool/Tool Template Drafts/performance multiplier by disability/"
 health_condition <- health[1]
-
 
 for (j in 0:100){
 
@@ -15,6 +14,7 @@ print(paste0("Disability percentage ",j," of 100"))
   
   
   file <- paste0("IPS Tool user friendly ", j)
+  
   
   ######################################################
   ### Read in the probabilities 
@@ -62,7 +62,14 @@ print(paste0("Disability percentage ",j," of 100"))
   calib_E2_trt <- suppressMessages( as.numeric(readxl::read_excel(paste0(path,file,".xlsx"), sheet = paste0("Tree IPS ", health_condition), range = "AC38:AC38", col_names = FALSE)) )
   calib_E3_trt <- suppressMessages( as.numeric(readxl::read_excel(paste0(path,file,".xlsx"), sheet = paste0("Tree IPS ", health_condition), range = "AC39:AC39", col_names = FALSE)) )
   
+
+
+multiplier_vector <- seq(-1,1,0.01)
+
+
+for (i in 1:length(multiplier_vector)){
   
+multiplier <- multiplier_vector[i]
 
 ### Increase the calibration factor (c) by a multiplier (m) to produce different
 
@@ -78,14 +85,6 @@ print(paste0("Disability percentage ",j," of 100"))
 ### 0 - no adjustment, produces the HLE treatment arm outcome 
 ### 1 - adjusts for the full difference of (1 - c), BAU outcome
 ### -1 - adjusts for the full difference of (c - 0), full employment 
-
-
-multiplier_vector <- seq(-1,1,0.01)
-
-
-for (i in 1:length(multiplier_vector)){
-  
-multiplier <- multiplier_vector[i]
 
 ####################################################
 #### Apply the multiplier to the calibration factor
@@ -179,10 +178,6 @@ if (i == 1){
 } else {
   data_out <- rbindlist(list(data_out, data))
 }
-
-EmpAt12mthTRT <- suppressMessages( as.numeric(readxl::read_excel(paste0(path,file,".xlsx"), sheet = paste0("Tree IPS ", health_condition), range = "AC20:AC20", col_names = FALSE)) )
-EmpAt12mthCTL <- suppressMessages( as.numeric(readxl::read_excel(paste0(path,file,".xlsx"), sheet = paste0("Tree Uptakers ", health_condition), range = "AC20:AC20", col_names = FALSE)) )
-EmpAt12mthBAU <- suppressMessages( as.numeric(readxl::read_excel(paste0(path,file,".xlsx"), sheet = paste0("Tree ", health_condition), range = "AC20:AC20", col_names = FALSE)) )
 
 }
 
