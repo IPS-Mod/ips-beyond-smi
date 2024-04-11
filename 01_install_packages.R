@@ -11,7 +11,7 @@ install.packages('fingertipsR')
 ##### INSTALL frsclean
 
 devtools::install_git(
-  "https://github.com/djmorris1989/frsclean.git", 
+  "https://github.com/IPS-COM/frsclean.git", 
   ref = "1.0.2",
   build_vignettes = TRUE
 )
